@@ -24,8 +24,11 @@
 #include "ShaderProgram.h"
 #include "stb_image.h"
 #include <iostream>
-#include <time.h>
 
+// —— NEW STUFF —— //
+#include <ctime>   //
+#include "cmath"   //
+// ——————————————— //
 using namespace std;
 
 const int WINDOW_WIDTH = 640,
@@ -66,13 +69,6 @@ ShaderProgram g_shader_program;
 
 int winner = -1;
 int p1_score, p2_score = 0;
-
-void printScore() {
-    cout << "\n````````````````````````````````\n";
-    cout << "\t\t P1: " << p1_score << "\t";
-    cout << "P2: " << p2_score << "\n";
-    cout << "````````````````````````````````\n\n";
-}
 
 // Important Globals
 glm::mat4 g_view_matrix, g_projection_matrix, g_ash_model_matrix, g_rocket_model_matrix, g_ball_model_matrix, g_ball_2_model_matrix, g_ball_3_model_matrix;
@@ -315,16 +311,12 @@ bool is_past_paddles(glm::vec3 ball_position) {
         if (p1_score == 3)
             winner = 1;
         
-        printScore();
-        
         return true;
     }
     else if (ball_position.x < left) {
         p2_score += 1;
         if (p1_score == 3)
             winner = 2;
-        
-        printScore();
         
         return true;
     }
@@ -436,12 +428,6 @@ void render() {
 }
 
 void shutdown() {
-    cout << "\n================================\n";
-    cout << "\t\t Player " << winner << " wins!\n";
-    cout << "\t\t Final Scores:\n";
-    printScore();
-    cout << " Thanks for playing, game over!\n";
-    cout << "================================\n\n";
     SDL_Quit();
 }
 
