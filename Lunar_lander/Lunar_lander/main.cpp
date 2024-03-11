@@ -61,7 +61,6 @@ GLuint g_font_texture_id, g_emolga_id;
 glm::mat4 g_view_matrix, g_projection_matrix;
 float g_previous_ticks = 0.0f;
 float g_time_accumulator = 0.0f;
-bool is_left = true;
 
 // Function Prototypes
 void initialise();
@@ -81,6 +80,12 @@ int main(int argc, char* argv[]) {
 
     shutdown();
     return 0;
+}
+
+std::string format_score(float score) {
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(2) << score;
+    return ss.str();
 }
 
 // Function to load a texture from file
@@ -205,7 +210,7 @@ void initialise() {
     g_game_state.player->set_acceleration(glm::vec3(0.0f, ACC_OF_GRAVITY * 0.01, 0.0f));
     g_game_state.player->set_speed(1.0f);
     g_game_state.player->set_score(100);
-    g_game_state.player->set_size(glm::vec3(0.5f, 0.5f, 0.0f));
+    g_game_state.player->set_size(glm::vec3(0.75f, 0.75f, 0.0f));
     g_game_state.player->m_texture_id = load_texture(SPRITESHEET_FILEPATH);
     g_game_state.player->m_walking[g_game_state.player->LEFT] = new int[2] {0, 1};
     g_game_state.player->m_walking[g_game_state.player->RIGHT] = new int[2] {1, 0};
@@ -250,13 +255,6 @@ void initialise() {
     g_game_state.platforms[2].set_type("platform");
     g_game_state.platforms[2].m_texture_id = load_texture(PLATFORM_FILEPATH);
     g_game_state.platforms[2].update(0.0f, NULL, 0);
-    
-    
-    // Base (bottom edge of screen)
-    g_game_state.platforms[3].set_position(glm::vec3(0.0f, -4.5f, 0.0f));
-    g_game_state.platforms[3].set_size(glm::vec3(20.0f, 0.0f, 0.0f));
-    g_game_state.platforms[3].set_type("edge");
-    g_game_state.platforms[3].update(0.0f, NULL, 0);
 
     // General OpenGL Settings
     glEnable(GL_BLEND);
@@ -295,11 +293,9 @@ void process_input() {
     if (g_game_state.player->get_score() > 0) {
         if (key_state[SDL_SCANCODE_LEFT]) {
             g_game_state.player->move_left();
-            is_left = true;
             g_game_state.player->m_animation_indices = g_game_state.player->m_walking[g_game_state.player->LEFT];
         } else if (key_state[SDL_SCANCODE_RIGHT]) {
             g_game_state.player->move_right();
-            is_left = false;
             g_game_state.player->m_animation_indices = g_game_state.player->m_walking[g_game_state.player->RIGHT];
         }
     }
@@ -335,33 +331,19 @@ void render() {
     g_game_state.background->render(&g_shader_program);
     g_game_state.player->render(&g_shader_program);
     
-    if (!is_left){
-        g_game_state.player->draw_sprite_from_texture_atlas(&g_shader_program, g_emolga_id, 1);
-    }
-    if (is_left){
-        g_game_state.player->draw_sprite_from_texture_atlas(&g_shader_program, g_emolga_id, 0);
-    }
-
     if (g_game_state.player->get_collision() == "") {
         g_game_state.player->render(&g_shader_program);
         for (int i = 0; i < PLATFORM_COUNT; i++) g_game_state.platforms[i].render(&g_shader_program);
-        std::stringstream ss;
-        ss << std::fixed << std::setprecision(2) << g_game_state.player->get_score();
-        std::string score = ss.str();
-        draw_text(&g_shader_program, g_font_texture_id, std::string("Energy:") + score, 0.4f, -0.15f, glm::vec3(1.65f, 3.5f, 0.0f));
+        float player_score = g_game_state.player->get_score();
+        std::string formatted_score = format_score(player_score);
+        draw_text(&g_shader_program, g_font_texture_id, std::string("Energy:") + formatted_score, 0.4f, -0.15f, glm::vec3(1.65f, 3.5f, 0.0f));
     }
     
     if (g_game_state.player->get_collision() == "platform") {
-        std::stringstream ss;
-        ss << std::fixed << std::setprecision(2) << g_game_state.player->get_score();
-        std::string score = ss.str();
-        draw_text(&g_shader_program, g_font_texture_id, std::string("Score:") + score, 0.8f, -0.3f, glm::vec3(-2.4f, -0.5f, 0.0f));
-        draw_text(&g_shader_program, g_font_texture_id, std::string("Vctory!"),0.8f, -0.3f, glm::vec3(-1.65f, 0.5f, 0.0f));
-    }
-    
-    if (g_game_state.player->get_collision() == "edge") {
-        draw_text(&g_shader_program, g_font_texture_id, std::string("Game Over!"),
-                  0.8f, -0.3f, glm::vec3(-1.85f, 0.0f, 0.0f));
+        float player_score = g_game_state.player->get_score();
+        std::string formatted_score = format_score(player_score);
+        draw_text(&g_shader_program, g_font_texture_id, std::string("Score:") + formatted_score, 0.8f, -0.3f, glm::vec3(-2.4f, -0.5f, 0.0f));
+        draw_text(&g_shader_program, g_font_texture_id, std::string("Victory!"),0.8f, -0.3f, glm::vec3(-1.65f, 0.5f, 0.0f));
     }
 
     SDL_GL_SwapWindow(g_display_window);
