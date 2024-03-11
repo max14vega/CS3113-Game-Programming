@@ -33,14 +33,16 @@
 // Constants
 const int WINDOW_WIDTH = 1280;
 const int WINDOW_HEIGHT = 820;
-const int PLATFORM_COUNT = 4;
+const int PLATFORM_COUNT = 3;
 const int FONTBANK_SIZE = 16;
 const float FIXED_TIMESTEP = 0.0166666f;
 const float ACC_OF_GRAVITY = -9.81f;
 const char V_SHADER_PATH[] = "shaders/vertex_textured.glsl",
            F_SHADER_PATH[] = "shaders/fragment_textured.glsl";
 const char BACKGROUND_FILEPATH[] = "assets/background.png",
-           PLATFORM_FILEPATH[] = "assets/tree.png",
+           PLATFORM_1_FILEPATH[] = "assets/tree.png",
+           PLATFORM_2_FILEPATH[] = "assets/tree2.png",
+           PLATFORM_3_FILEPATH[] = "assets/tree3.png",
            SPRITESHEET_FILEPATH[] = "assets/emolga_sheet.png",
            FONT_FILEPATH[] = "assets/font1.png";
 const float MILLISECONDS_IN_SECOND = 1000.0;
@@ -235,7 +237,7 @@ void initialise() {
     g_game_state.platforms[0].set_position(g_platform_locations[0]);
     g_game_state.platforms[0].set_score(g_platform_scores[0]);
     g_game_state.platforms[0].set_type("platform");
-    g_game_state.platforms[0].m_texture_id = load_texture(PLATFORM_FILEPATH);
+    g_game_state.platforms[0].m_texture_id = load_texture(PLATFORM_1_FILEPATH);
     g_game_state.platforms[0].update(0.0f, NULL, 0);
     
     
@@ -244,7 +246,7 @@ void initialise() {
     g_game_state.platforms[1].set_position(g_platform_locations[1]);
     g_game_state.platforms[1].set_score(g_platform_scores[1]);
     g_game_state.platforms[1].set_type("platform");
-    g_game_state.platforms[1].m_texture_id = load_texture(PLATFORM_FILEPATH);
+    g_game_state.platforms[1].m_texture_id = load_texture(PLATFORM_2_FILEPATH);
     g_game_state.platforms[1].update(0.0f, NULL, 0);
     
     
@@ -253,9 +255,10 @@ void initialise() {
     g_game_state.platforms[2].set_position(g_platform_locations[2]);
     g_game_state.platforms[2].set_score(g_platform_scores[2]);
     g_game_state.platforms[2].set_type("platform");
-    g_game_state.platforms[2].m_texture_id = load_texture(PLATFORM_FILEPATH);
+    g_game_state.platforms[2].m_texture_id = load_texture(PLATFORM_3_FILEPATH);
     g_game_state.platforms[2].update(0.0f, NULL, 0);
-
+    
+    
     // General OpenGL Settings
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -345,6 +348,10 @@ void render() {
         draw_text(&g_shader_program, g_font_texture_id, std::string("Score:") + formatted_score, 0.8f, -0.3f, glm::vec3(-2.4f, -0.5f, 0.0f));
         draw_text(&g_shader_program, g_font_texture_id, std::string("Victory!"),0.8f, -0.3f, glm::vec3(-1.65f, 0.5f, 0.0f));
     }
+    
+//    if (g_game_state.player->get_collision() == "edge") {
+//        draw_text(&g_shader_program, g_font_texture_id, std::string("Game Over!"), 0.8f, -0.3f, glm::vec3(-1.85f, 0.0f, 0.0f));
+//    }
 
     SDL_GL_SwapWindow(g_display_window);
 }
