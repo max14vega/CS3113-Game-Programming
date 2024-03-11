@@ -334,25 +334,24 @@ void render() {
     g_game_state.background->render(&g_shader_program);
     g_game_state.player->render(&g_shader_program);
     
-    if (g_game_state.player->get_collision() == "") {
-        g_game_state.player->render(&g_shader_program);
-        for (int i = 0; i < PLATFORM_COUNT; i++) g_game_state.platforms[i].render(&g_shader_program);
-        float player_score = g_game_state.player->get_score();
-        std::string formatted_score = format_score(player_score);
-        draw_text(&g_shader_program, g_font_texture_id, std::string("Energy:") + formatted_score, 0.4f, -0.15f, glm::vec3(1.65f, 3.5f, 0.0f));
+    //Have the screeen rendering the score at all times if there are no collisions
+    g_game_state.player->render(&g_shader_program);
+    for (int i = 0; i < PLATFORM_COUNT; i++){
+        g_game_state.platforms[i].render(&g_shader_program);
     }
     
+    float player_score = g_game_state.player->get_score();
+    
+    std::string formatted_score = format_score(player_score);
+    draw_text(&g_shader_program, g_font_texture_id, std::string("Energy:") + formatted_score, 0.4f, -0.15f, glm::vec3(1.65f, 3.5f, 0.0f));
+
+    //Once the player collides with the platform, calculate score and return with victory end screen
     if (g_game_state.player->get_collision() == "platform") {
-        float player_score = g_game_state.player->get_score();
         std::string formatted_score = format_score(player_score);
         draw_text(&g_shader_program, g_font_texture_id, std::string("Score:") + formatted_score, 0.8f, -0.3f, glm::vec3(-2.4f, -0.5f, 0.0f));
         draw_text(&g_shader_program, g_font_texture_id, std::string("Victory!"),0.8f, -0.3f, glm::vec3(-1.65f, 0.5f, 0.0f));
     }
     
-//    if (g_game_state.player->get_collision() == "edge") {
-//        draw_text(&g_shader_program, g_font_texture_id, std::string("Game Over!"), 0.8f, -0.3f, glm::vec3(-1.85f, 0.0f, 0.0f));
-//    }
-
     SDL_GL_SwapWindow(g_display_window);
 }
 
