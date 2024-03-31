@@ -3,9 +3,12 @@
 #define LOG(argument) std::cout << argument << '\n'
 #define GL_GLEXT_PROTOTYPES 1
 #define FIXED_TIMESTEP 0.0166666f
-#define ENEMY_COUNT 1
-#define LEVEL1_WIDTH 26
+#define ENEMY_COUNT 3
+#define LEVEL1_WIDTH 37
 #define LEVEL1_HEIGHT 29
+
+//#define LEVEL1_WIDTH 14
+//#define LEVEL1_HEIGHT 5
 
 #ifdef _WINDOWS
 #include <GL/glew.h>
@@ -58,9 +61,12 @@ const char  V_SHADER_PATH[] = "shaders/vertex_textured.glsl",
 
 const float MILLISECONDS_IN_SECOND = 1000.0;
 
-const char  SPRITESHEET_FILEPATH[]  = "assets/images/george_0.png",
+const char  SPRITESHEET_FILEPATH[]  = "assets/images/ClefairySpriteSheet.png",
+            ZUBAT_FILEPATH[]        = "assets/images/ZubatSpriteSheet.png",
+            RATATA_FILEPATH[]       = "assets/images/RatataSpriteSheet.png",
+            MAGBY_FILEPATH[]        = "assets/images/MagbySpriteSheet.png",
             MAP_TILESET_FILEPATH[]  = "assets/images/tilemap_packed.png",
-            BACKGROUND_FILEPATH[]    = "assets/images/cave_background.png",
+            BACKGROUND_FILEPATH[]   = "assets/images/wp13159348-pixel-cave-wallpapers.png",
             BGM_FILEPATH[]          = "assets/audio/dooblydoo.mp3",
             JUMP_SFX_FILEPATH[]     = "assets/audio/bounce.wav";
 
@@ -68,37 +74,39 @@ const int NUMBER_OF_TEXTURES = 1;
 const GLint LEVEL_OF_DETAIL = 0;
 const GLint TEXTURE_BORDER = 0;
 
+
+
 unsigned int LEVEL_1_DATA[] =
 {
-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  2,  2,  2,  2,
-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,123,122,122,122,
-      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,123,122,122,122,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,123,122,122,122,
-    0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,0,0,0,0,123,122,122,122,
-    0,0,0,0,0,0,0,0,0,0,0,0,123,122,122,122,122,121,0,0,0,0,123,122,122,122,
-    0,0,0,0,0,0,0,0,0,0,0,0,123,122,122,122,122,121,0,0,0,0,123,122,122,122,
-    0,0,0,0,0,0,0,0,0,0,0,0,123,122,122,122,122,24,2,2,2,2,25,122,122,122,
-    0,0,0,0,0,0,0,0,0,0,0,0,123,122,122,122,122,122,122,122,122,122,122,122,122,122,
-    2,2,2,2,2,0,0,0,0,0,0,0,123,122,122,122,122,122,122,122,122,122,122,122,122,122,
-    122,122,122,122,24,2,2,2,2,2,2,2,25,122,122,122,122,122,122,122,122,122,122,122,122,122,
-    122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,
-    122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,
-    122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,
-    122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,
-    122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,
-    122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122
+    143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,
+    143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,
+    143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,
+    143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,
+    143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,
+    143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,
+    143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,
+    143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,
+    143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,
+    24,62,62,62,62,62,62,62,62,62,62,62,62,43,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,
+    122,122,122,122,122,122,122,122,122,4,142,142,143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,
+    122,122,122,122,122,122,122,4,142,143,0,0,0,0,0,0,47,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,
+    122,122,122,122,122,4,142,143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,
+    4,142,142,142,142,143,0,0,0,0,0,0,0,0,0,0,0,0,41,62,62,62,62,62,62,43,0,0,0,0,0,0,0,0,0,0,141,
+    143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,142,142,142,142,143,0,0,0,0,0,0,0,0,0,0,0,141,
+    143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,47,0,0,0,0,0,0,0,0,141,
+    143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,
+    143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,
+    143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,61,62,62,62,62,62,62,62,25,
+    143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,121,122,122,122,122,122,122,122,122,
+    143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,61,62,62,62,25,122,122,122,122,122,122,122,122,
+    24,62,62,62,63,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,121,122,122,122,122,122,122,122,122,122,122,122,122,
+    122,122,122,122,24,62,62,62,62,62,62,62,62,62,62,62,62,62,62,62,62,62,62,62,25,122,122,122,122,122,122,122,122,122,122,122,122,
+    122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,
+    122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,
+    122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,
+    122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,
+    122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,
+    122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122,122
 };
 
 // ————— VARIABLES ————— //
@@ -162,7 +170,7 @@ void initialise()
     g_shader_program.load(V_SHADER_PATH, F_SHADER_PATH);
 
     g_view_matrix = glm::mat4(1.0f);
-    g_view_matrix = glm::translate(g_view_matrix, glm::vec3(1.0f, 1.0f, 0.0f));
+    g_view_matrix = glm::translate(g_view_matrix, glm::vec3(-18.0f, 13.0f, 0.0f));
     g_projection_matrix = glm::ortho(-5.0f * 3.5, 5.0f * 3.5, -3.75f * 3.5, 3.75f * 3.5, -1.0f * 3.5, 1.0f * 3.5);
 
     g_shader_program.set_projection_matrix(g_projection_matrix);
@@ -178,40 +186,120 @@ void initialise()
     
     // ————— BACKGROUND SET-UP ————— //
     g_game_state.background = new Entity();
-    g_game_state.background->set_position(glm::vec3(1.0f, 1.0f, 0.0f));
-    g_game_state.background->set_size(glm::vec3(20.0f, 20.0f, 0.0f));
+    g_game_state.background->set_position(glm::vec3(15.0f, -13.0f, 0.0f));
+    g_game_state.background->set_size(glm::vec3(45.0f, 30.0f, 0.0f));
     g_game_state.background->m_texture_id = load_texture(BACKGROUND_FILEPATH);
     g_game_state.background->update(0.0f, g_game_state.background, NULL, 0, g_game_state.map);
 
 
-    // ————— GEORGE SET-UP ————— //
+    // ————— PLAYER SET-UP ————— //
     // Existing
     g_game_state.player = new Entity();
     g_game_state.player->set_entity_type(PLAYER);
-    g_game_state.player->set_position(glm::vec3(0.0f, 0.0f, 0.0f));
+    g_game_state.player->set_position(glm::vec3(1.4f, -18.0f, 0.0f));
     g_game_state.player->set_movement(glm::vec3(0.0f));
-    g_game_state.player->set_speed(2.5f);
-    g_game_state.player->set_acceleration(glm::vec3(0.0f, -9.81f, 0.0f));
+    g_game_state.player->set_speed(3.5f);
+    g_game_state.player->set_health(4);
+    g_game_state.player->set_acceleration(glm::vec3(0.0f, -11.81f, 0.0f));
     g_game_state.player->m_texture_id = load_texture(SPRITESHEET_FILEPATH);
 
     // Walking
-    g_game_state.player->m_walking[g_game_state.player->LEFT] = new int[4] { 1, 5, 9, 13 };
-    g_game_state.player->m_walking[g_game_state.player->RIGHT] = new int[4] { 3, 7, 11, 15 };
-    g_game_state.player->m_walking[g_game_state.player->UP] = new int[4] { 2, 6, 10, 14 };
-    g_game_state.player->m_walking[g_game_state.player->DOWN] = new int[4] { 0, 4, 8, 12 };
+    g_game_state.player->m_walking[g_game_state.player->LEFT] = new int[2] { 0, 1 };
+    g_game_state.player->m_walking[g_game_state.player->RIGHT] = new int[2] { 2, 3 };
 
     g_game_state.player->m_animation_indices = g_game_state.player->m_walking[g_game_state.player->RIGHT];  // start George looking left
-    g_game_state.player->m_animation_frames = 4;
+    g_game_state.player->m_animation_frames = 2;
     g_game_state.player->m_animation_index = 0;
     g_game_state.player->m_animation_time = 0.0f;
-    g_game_state.player->m_animation_cols = 4;
-    g_game_state.player->m_animation_rows = 4;
+    g_game_state.player->m_animation_cols = 2;
+    g_game_state.player->m_animation_rows = 2;
     g_game_state.player->set_height(0.8f);
     g_game_state.player->set_width(0.8f);
     g_game_state.player->set_size(glm::vec3(1.3f * 1.3, 2.0f * 1.4, 0.0f));
 
     // Jumping
-    g_game_state.player->m_jumping_power = 5.0f;
+    g_game_state.player->m_jumping_power = 7.0f;
+    
+    
+    g_game_state.enemies = new Entity[ENEMY_COUNT];
+        
+    // ————— RATATA SET-UP (index 0) ————— //
+    // Existing
+    g_game_state.enemies[0].set_position(glm::vec3(17.0f, -18.0f, 0.0f));
+    g_game_state.enemies[0].set_movement(glm::vec3(0.0f));
+    g_game_state.enemies[0].set_speed(1.5f);
+    g_game_state.enemies[0].set_acceleration(glm::vec3(0.0f, -11.81f, 0.0f));
+    g_game_state.enemies[0].set_entity_type(ENEMY);
+    g_game_state.enemies[0].set_ai_type(WALKER);
+    g_game_state.enemies[0].set_health(2);
+    g_game_state.enemies[0].m_texture_id = load_texture(RATATA_FILEPATH);
+    
+    // Walking
+    g_game_state.enemies[0].m_walking[g_game_state.enemies[0].LEFT]     = new int[2] { 0, 1};
+    g_game_state.enemies[0].m_walking[g_game_state.enemies[0].RIGHT]    = new int[2] { 2, 3};
+    
+    g_game_state.enemies[0].m_animation_indices = g_game_state.enemies[0].m_walking[g_game_state.enemies[0].LEFT];
+    g_game_state.enemies[0].m_animation_frames = 2;
+    g_game_state.enemies[0].m_animation_index = 0;
+    g_game_state.enemies[0].m_animation_time = 0.0f;
+    g_game_state.enemies[0].m_animation_cols = 2;
+    g_game_state.enemies[0].m_animation_rows = 2;
+    g_game_state.enemies[0].set_height(0.8f);
+    g_game_state.enemies[0].set_width(0.8f);
+    g_game_state.enemies[0].set_size(glm::vec3(1.3f * 1.4, 2.0f * 1.3, 0.0f));
+    
+    
+    // ————— ZUBAT SET-UP (index 1) ————— //
+    // Existing
+    g_game_state.enemies[1].set_position(glm::vec3(28.0f, -7.0f, 0.0f));
+    g_game_state.enemies[1].set_movement(glm::vec3(0.0f));
+    g_game_state.enemies[1].set_speed(1.5f);
+    g_game_state.enemies[1].set_acceleration(glm::vec3(0.0f, 0, 0.0f));
+    g_game_state.enemies[1].set_entity_type(ENEMY);
+    g_game_state.enemies[1].set_ai_type(DRONE);
+    g_game_state.enemies[1].set_ai_state(IDLE);
+    g_game_state.enemies[1].set_health(1);
+    g_game_state.enemies[1].m_texture_id = load_texture(ZUBAT_FILEPATH);
+    
+    // Walking
+    g_game_state.enemies[1].m_walking[g_game_state.enemies[1].RIGHT]     = new int[2] { 0, 1};
+    g_game_state.enemies[1].m_walking[g_game_state.enemies[1].LEFT]    = new int[2] { 2, 3};
+    
+    g_game_state.enemies[1].m_animation_indices = g_game_state.enemies[1].m_walking[g_game_state.enemies[1].LEFT];
+    g_game_state.enemies[1].m_animation_frames = 2;
+    g_game_state.enemies[1].m_animation_index = 0;
+    g_game_state.enemies[1].m_animation_time = 0.0f;
+    g_game_state.enemies[1].m_animation_cols = 2;
+    g_game_state.enemies[1].m_animation_rows = 2;
+    g_game_state.enemies[1].set_height(0.8f);
+    g_game_state.enemies[1].set_width(0.8f);
+    g_game_state.enemies[1].set_size(glm::vec3(1.3f * 1.4, 2.0f * 1.3, 0.0f));
+    
+    // ————— MAGBY SET-UP (index 0) ————— //
+    // Existing
+    g_game_state.enemies[2].set_position(glm::vec3(1.3f, -8.0f, 0.0f));
+    g_game_state.enemies[2].set_movement(glm::vec3(0.0f));
+    g_game_state.enemies[2].set_speed(1.5f);
+    g_game_state.enemies[2].set_acceleration(glm::vec3(0.0f, -11.81f, 0.0f));
+    g_game_state.enemies[2].set_entity_type(ENEMY);
+    g_game_state.enemies[2].set_ai_type(BOSS);
+    g_game_state.enemies[2].set_ai_state(IDLE);
+    g_game_state.enemies[2].set_health(4);
+    g_game_state.enemies[2].m_texture_id = load_texture(MAGBY_FILEPATH);
+    
+    // Walking
+    g_game_state.enemies[2].m_walking[g_game_state.enemies[2].RIGHT]     = new int[2] { 0, 1};
+    g_game_state.enemies[2].m_walking[g_game_state.enemies[2].LEFT]    = new int[2] { 2, 3};
+    
+    g_game_state.enemies[2].m_animation_indices = g_game_state.enemies[2].m_walking[g_game_state.enemies[2].RIGHT];
+    g_game_state.enemies[2].m_animation_frames = 2;
+    g_game_state.enemies[2].m_animation_index = 0;
+    g_game_state.enemies[2].m_animation_time = 0.0f;
+    g_game_state.enemies[2].m_animation_cols = 2;
+    g_game_state.enemies[2].m_animation_rows = 2;
+    g_game_state.enemies[2].set_height(0.8f);
+    g_game_state.enemies[2].set_width(0.8f);
+    g_game_state.enemies[2].set_size(glm::vec3(1.3f * 1.4, 2.0f * 1.3, 0.0f));
 
 
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
@@ -303,13 +391,19 @@ void update()
     while (delta_time >= FIXED_TIMESTEP)
     {
         g_game_state.player->update(FIXED_TIMESTEP, g_game_state.player, NULL, 0, g_game_state.map);
+        
+        
+        for (int i = 0; i < ENEMY_COUNT; i++) {
+            g_game_state.enemies[i].update(FIXED_TIMESTEP, g_game_state.player, NULL, 0, g_game_state.map);
+        }
+        
         delta_time -= FIXED_TIMESTEP;
     }
+    
+    
 
     g_accumulator = delta_time;
 
-    g_view_matrix = glm::mat4(1.0f);
-    g_view_matrix = glm::translate(g_view_matrix, glm::vec3(-g_game_state.player->get_position().x, 0.0f, 0.0f));
 }
 
 void render()
@@ -320,6 +414,9 @@ void render()
     
     g_game_state.background->render(&g_shader_program);
     g_game_state.player->render(&g_shader_program);
+    for(int i = 0; i < ENEMY_COUNT; i ++){
+        g_game_state.enemies[i].render(&g_shader_program);
+    }
     g_game_state.map->render(&g_shader_program);
 
     SDL_GL_SwapWindow(g_display_window);

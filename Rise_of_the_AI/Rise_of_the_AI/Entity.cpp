@@ -81,42 +81,79 @@ void Entity::ai_activate(Entity* player)
         ai_walk();
         break;
 
-    case GUARD:
-        ai_guard(player);
+    case DRONE:
+        ai_drone(player);
+        break;
+            
+    case BOSS:
+        ai_boss(player);
         break;
 
     default:
         break;
     }
+}
+
+void Entity::ai_boss(Entity* player)
+{
+    //work in progress
 }
 
 void Entity::ai_walk()
 {
-    m_movement = glm::vec3(-1.0f, 0.0f, 0.0f);
+    if (m_ratata_direction == -1) {
+        m_animation_indices = m_walking[LEFT];
+    } else if (m_ratata_direction == 1) {
+        m_animation_indices = m_walking[RIGHT];
+    }
+    
+    if (m_ratata_path >= MAX_RATATA_DIST) {
+        m_ratata_direction *= -1;
+        m_ratata_path = 0;
+    }
+    
+    m_movement = glm::vec3(m_ratata_direction, 0.0f, 0.0f);
+    m_ratata_path += 0.01f;
 }
 
-void Entity::ai_guard(Entity* player)
+void Entity::ai_drone(Entity* player)
 {
     switch (m_ai_state) {
-    case IDLE:
-        if (glm::distance(m_position, player->get_position()) < 3.0f) m_ai_state = WALKING;
-        break;
+        case IDLE:
+            if (m_zubat_direction == -1) {
+                m_animation_indices = m_walking[LEFT];
+            } else if (m_zubat_direction == 1) {
+                m_animation_indices = m_walking[RIGHT];
+            }
+            
+            if (m_zubat_path >= MAX_ZUBAT_DIST) {
+                m_zubat_direction *= -1;
+                m_zubat_path = 0;
+            }
+            
+            m_movement = glm::vec3(m_zubat_direction, 0.0f, 0.0f);
+            m_zubat_path += 0.01f;
+            
+            if (glm::distance(m_position, player->get_position()) < 8.0f) m_ai_state = FLYING;
+            break;
 
-    case WALKING:
-        if (m_position.x > player->get_position().x) {
-            m_movement = glm::vec3(-1.0f, 0.0f, 0.0f);
+        case FLYING:
+            if (m_position.x > player->get_position().x) {
+                m_animation_indices = m_walking[LEFT];
+                m_movement = glm::vec3(-1.0f, 0.0f, 0.0f);
+            }
+            else {
+                m_animation_indices = m_walking[RIGHT];
+                m_movement = glm::vec3(1.0f, 0.0f, 0.0f);
+            }
+            break;
+
+        case ATTACKING:
+            break;
+
+        default:
+            break;
         }
-        else {
-            m_movement = glm::vec3(1.0f, 0.0f, 0.0f);
-        }
-        break;
-
-    case ATTACKING:
-        break;
-
-    default:
-        break;
-    }
 }
 
 
@@ -128,6 +165,7 @@ void Entity::update(float delta_time, Entity* player, Entity* objects, int objec
     m_collided_bottom = false;
     m_collided_left = false;
     m_collided_right = false;
+    m_collided_enemy = false;
 
     if (m_entity_type == ENEMY) ai_activate(player);
 
@@ -167,12 +205,17 @@ void Entity::update(float delta_time, Entity* player, Entity* objects, int objec
     if (m_is_jumping)
     {
         m_is_jumping = false;
-
         m_velocity.y += m_jumping_power;
     }
+    
+    if (m_collided_enemy) {
+            m_health -= 1;
+        }
+    
 
     m_model_matrix = glm::mat4(1.0f);
     m_model_matrix = glm::translate(m_model_matrix, m_position);
+    m_model_matrix = glm::scale(m_model_matrix, m_scale_size);
 }
 
 void const Entity::check_collision_y(Entity* collidable_entities, int collidable_entity_count)

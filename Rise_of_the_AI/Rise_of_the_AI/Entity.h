@@ -1,8 +1,8 @@
 #include "Map.h"
 
 enum EntityType { PLATFORM, PLAYER, ENEMY   };
-enum AIType     { WALKER, GUARD             };
-enum AIState    { WALKING, IDLE, ATTACKING  };
+enum AIType     { WALKER, DRONE, BOSS       };
+enum AIState    { FLYING, IDLE, ATTACKING  };
 
 class Entity
 {
@@ -67,12 +67,23 @@ public:
     
     // ––––– HEALTH ––––– //
     int m_health = 0;
-
+    
+    // ––––– RATATA BEHAVIOR ––––– //
+    int m_ratata_direction = -1;
+    float m_ratata_path = 0.0f;
+    float MAX_RATATA_DIST = 3.0f;
+    
+    // ––––– RATATA BEHAVIOR ––––– //
+    int m_zubat_direction = 1;
+    float m_zubat_path = 0.0f;
+    float MAX_ZUBAT_DIST = 2.0f;
+    
     // ––––– PHYSICS (COLLISIONS) ––––– //
     bool m_collided_top = false;
     bool m_collided_bottom = false;
     bool m_collided_left = false;
     bool m_collided_right = false;
+    bool m_collided_enemy = false;
 
     GLuint    m_texture_id;
 
@@ -99,7 +110,8 @@ public:
 
     void ai_activate(Entity* player);
     void ai_walk();
-    void ai_guard(Entity* player);
+    void ai_drone(Entity* player);
+    void ai_boss(Entity* player);
 
     void activate() { m_is_active = true; };
     void deactivate() { m_is_active = false; };
