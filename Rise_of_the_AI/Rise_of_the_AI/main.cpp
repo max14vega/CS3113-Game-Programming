@@ -65,16 +65,18 @@ const char  SPRITESHEET_FILEPATH[]  = "assets/images/ClefairySpriteSheet.png",
             ZUBAT_FILEPATH[]        = "assets/images/ZubatSpriteSheet.png",
             RATATA_FILEPATH[]       = "assets/images/RatataSpriteSheet.png",
             MAGBY_FILEPATH[]        = "assets/images/MagbySpriteSheet.png",
+            EMBER_FILEPATH[]        = "assets/images/FIREBALL_SPRITESHEET.png",
             MAP_TILESET_FILEPATH[]  = "assets/images/tilemap_packed.png",
             BACKGROUND_FILEPATH[]   = "assets/images/wp13159348-pixel-cave-wallpapers.png",
-            BGM_FILEPATH[]          = "assets/audio/dooblydoo.mp3",
+            BGM_FILEPATH[]          = "assets/audio/CaveBGM.mp3",
             JUMP_SFX_FILEPATH[]     = "assets/audio/bounce.wav";
 
 const int NUMBER_OF_TEXTURES = 1;
 const GLint LEVEL_OF_DETAIL = 0;
 const GLint TEXTURE_BORDER = 0;
 
-
+const int LOOP_FOREVER = -1;
+Mix_Music *g_music;
 
 unsigned int LEVEL_1_DATA[] =
 {
@@ -303,11 +305,13 @@ void initialise()
 
 
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
+    
+    
 
     g_game_state.bgm = Mix_LoadMUS(BGM_FILEPATH);
-    Mix_PlayMusic(g_game_state.bgm, -1);
-    Mix_VolumeMusic(MIX_MAX_VOLUME / 16.0f);
-    Mix_HaltMusic();
+    Mix_PlayMusic(g_game_state.bgm, LOOP_FOREVER);
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 2.0f);
+    //Mix_HaltMusic();
 
     g_game_state.jump_sfx = Mix_LoadWAV(JUMP_SFX_FILEPATH);
 
