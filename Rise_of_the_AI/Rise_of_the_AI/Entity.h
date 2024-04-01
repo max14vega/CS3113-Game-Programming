@@ -1,8 +1,18 @@
+/**
+* Author: Max Vega
+* Assignment: Rise of the AI
+* Date due: 2024-03-30, 11:59pm
+* I pledge that I have completed this assignment without
+* collaborating with anyone else, in conformance with the
+* NYU School of Engineering Policies and Procedures on
+* Academic Misconduct.
+**/
+
 #include "Map.h"
 
-enum EntityType { PLATFORM, PLAYER, ENEMY   };
-enum AIType     { WALKER, DRONE, BOSS       };
-enum AIState    { FLYING, IDLE, ATTACKING  };
+enum EntityType { PLATFORM, PLAYER, ENEMY, HEALTH};
+enum AIType     { RATATA, ZUBAT, MAGBY };
+enum AIState    { WALKING, IDLE, ATTACKING  };
 
 class Entity
 {
@@ -12,8 +22,8 @@ private:
     // ––––– ANIMATION ––––– //
     int* m_animation_right = NULL, // move to the right
         * m_animation_left = NULL, // move to the left
-        * m_animation_up   = NULL, // move upwards
-        * m_animation_down = NULL; // move downwards
+        * m_animation_up_left  = NULL, // move upwards
+        * m_animation_up_right = NULL; // move downwards
 
     // ––––– PHYSICS (GRAVITY) ––––– //
     glm::vec3 m_position;
@@ -26,7 +36,6 @@ private:
     glm::mat4 m_model_matrix;
     glm::vec3 m_scale_size = glm::vec3(1.0f, 1.0f, 0.0f);
 
-
     // ————— ENEMY AI ————— //
     EntityType m_entity_type;
     AIType     m_ai_type;
@@ -38,21 +47,21 @@ private:
 
 public:
     // ————— STATIC VARIABLES ————— //
-    static const int    SECONDS_PER_FRAME = 4;
-    static const int    LEFT    = 0,
-                        RIGHT   = 1,
-                        UP      = 2,
-                        DOWN    = 3;
+    static const int    SECONDS_PER_FRAME = 16;
+    static const int    LEFT     = 0,
+                        RIGHT    = 1,
+                        UP_LEFT  = 2,
+                        UP_RIGHT = 3;
 
     // ————— ANIMATION ————— //
     int** m_walking = new int* [4]
         {
             m_animation_left,
             m_animation_right,
-            m_animation_up,
-            m_animation_down
+            m_animation_up_left,
+            m_animation_up_right
         };
-
+    
     int m_animation_frames  = 0,
         m_animation_index   = 0,
         m_animation_cols    = 0,
@@ -64,26 +73,33 @@ public:
     // ––––– PHYSICS (JUMPING) ––––– //
     bool  m_is_jumping = false;
     float m_jumping_power = 0;
-    
-    // ––––– HEALTH ––––– //
-    int m_health = 0;
-    
-    // ––––– RATATA BEHAVIOR ––––– //
-    int m_ratata_direction = -1;
-    float m_ratata_path = 0.0f;
-    float MAX_RATATA_DIST = 3.0f;
-    
-    // ––––– RATATA BEHAVIOR ––––– //
-    int m_zubat_direction = 1;
-    float m_zubat_path = 0.0f;
-    float MAX_ZUBAT_DIST = 2.0f;
-    
+
     // ––––– PHYSICS (COLLISIONS) ––––– //
     bool m_collided_top = false;
     bool m_collided_bottom = false;
     bool m_collided_left = false;
     bool m_collided_right = false;
-    bool m_collided_enemy = false;
+    bool m_collided_with_enemy = false;
+    
+    // ––––– PHYSICS (ATTACKING) ––––– //
+    bool m_is_attacking = false;
+    bool m_attacked = false;
+    int m_attack_direction = 1;
+    
+    // ––––– HEALTH ––––– //
+    int m_health = 0;
+    
+    // ––––– ENEMY POKEMON INFO ––––– //
+    int m_ratata_direction = -1;
+    int m_zubat_direction = 1;
+    int m_magby_direction = 1;
+    
+    float m_ratata_path = 0.0f;
+    float m_zubat_path = 0.0f;
+    
+    const float MAX_RATATA_PATH = 5.0f;
+    const float MAX_ZUBAT_PATH = 5.0f;
+    const float MAX_EMBER_DISTANCE = 5.0f;
 
     GLuint    m_texture_id;
 
@@ -109,9 +125,9 @@ public:
     void move_down()    { m_movement.y = -1.0f; };
 
     void ai_activate(Entity* player);
-    void ai_walk();
-    void ai_drone(Entity* player);
-    void ai_boss(Entity* player);
+    void ratata_ai(Entity* player);
+    void zubat_ai(Entity* player);
+    void magby_ai(Entity* player);
 
     void activate() { m_is_active = true; };
     void deactivate() { m_is_active = false; };
@@ -134,15 +150,16 @@ public:
     void const set_entity_type(EntityType new_entity_type)  { m_entity_type = new_entity_type;      };
     void const set_ai_type(AIType new_ai_type)              { m_ai_type = new_ai_type;              };
     void const set_ai_state(AIState new_state)              { m_ai_state = new_state;               };
+    void const set_active(bool new_active)                  { m_is_active = new_active;             };
     void const set_position(glm::vec3 new_position)         { m_position = new_position;            };
     void const set_movement(glm::vec3 new_movement)         { m_movement = new_movement;            };
     void const set_velocity(glm::vec3 new_velocity)         { m_velocity = new_velocity;            };
     void const set_speed(float new_speed)                   { m_speed = new_speed;                  };
     void const set_jumping_power(float new_jumping_power)   { m_jumping_power = new_jumping_power;  };
-    void const set_health(float new_health)                 { m_health = new_health;                };
     void const set_acceleration(glm::vec3 new_acceleration) { m_acceleration = new_acceleration;    };
     void const set_width(float new_width)                   { m_width = new_width;                  };
     void const set_height(float new_height)                 { m_height = new_height;                };
+    void const set_health(float new_health)                 { m_health = new_health;                };
     void const set_size(glm::vec3 new_size)                 { m_scale_size = new_size;
                                                               m_width     *= m_scale_size.x;
                                                               m_height    *= m_scale_size.y;        };

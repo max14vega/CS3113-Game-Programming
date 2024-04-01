@@ -1,3 +1,13 @@
+/**
+* Author: Max Vega
+* Assignment: Rise of the AI
+* Date due: 2024-03-30, 11:59pm
+* I pledge that I have completed this assignment without
+* collaborating with anyone else, in conformance with the
+* NYU School of Engineering Policies and Procedures on
+* Academic Misconduct.
+**/
+
 #define GL_SILENCE_DEPRECATION
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -28,8 +38,6 @@ Entity::Entity()
 
 Entity::~Entity()
 {
-    delete[] m_animation_up;
-    delete[] m_animation_down;
     delete[] m_animation_left;
     delete[] m_animation_right;
     delete[] m_walking;
@@ -77,16 +85,16 @@ void Entity::ai_activate(Entity* player)
 {
     switch (m_ai_type)
     {
-    case WALKER:
-        ai_walk();
+    case RATATA:
+        ratata_ai(player);
         break;
 
-    case DRONE:
-        ai_drone(player);
+    case ZUBAT:
+        zubat_ai(player);
         break;
             
-    case BOSS:
-        ai_boss(player);
+    case MAGBY:
+        magby_ai(player);
         break;
 
     default:
@@ -94,50 +102,26 @@ void Entity::ai_activate(Entity* player)
     }
 }
 
-void Entity::ai_boss(Entity* player)
-{
-    //work in progress
-}
-
-void Entity::ai_walk()
-{
-    if (m_ratata_direction == -1) {
-        m_animation_indices = m_walking[LEFT];
-    } else if (m_ratata_direction == 1) {
-        m_animation_indices = m_walking[RIGHT];
-    }
-    
-    if (m_ratata_path >= MAX_RATATA_DIST) {
-        m_ratata_direction *= -1;
-        m_ratata_path = 0;
-    }
-    
-    m_movement = glm::vec3(m_ratata_direction, 0.0f, 0.0f);
-    m_ratata_path += 0.01f;
-}
-
-void Entity::ai_drone(Entity* player)
-{
+void Entity::ratata_ai(Entity* player){
     switch (m_ai_state) {
-        case IDLE:
-            if (m_zubat_direction == -1) {
+        case WALKING:
+            m_speed = 0.5f;
+            if (m_ratata_direction == -1) {
                 m_animation_indices = m_walking[LEFT];
-            } else if (m_zubat_direction == 1) {
+            } else if (m_ratata_direction == 1) {
                 m_animation_indices = m_walking[RIGHT];
             }
-            
-            if (m_zubat_path >= MAX_ZUBAT_DIST) {
-                m_zubat_direction *= -1;
-                m_zubat_path = 0;
+            if (m_ratata_path >= MAX_RATATA_PATH) {
+                m_ratata_direction *= -1;
+                m_ratata_path = 0;
             }
-            
-            m_movement = glm::vec3(m_zubat_direction, 0.0f, 0.0f);
-            m_zubat_path += 0.01f;
-            
-            if (glm::distance(m_position, player->get_position()) < 8.0f) m_ai_state = FLYING;
+            m_movement = glm::vec3(m_ratata_direction, 0.0f, 0.0f);
+            m_ratata_path += 0.01f;
+            if (glm::distance(m_position, player->get_position()) < 5.0f) m_ai_state = ATTACKING;
             break;
-
-        case FLYING:
+            
+        case ATTACKING:
+            m_speed = 1.2f;
             if (m_position.x > player->get_position().x) {
                 m_animation_indices = m_walking[LEFT];
                 m_movement = glm::vec3(-1.0f, 0.0f, 0.0f);
@@ -146,41 +130,124 @@ void Entity::ai_drone(Entity* player)
                 m_animation_indices = m_walking[RIGHT];
                 m_movement = glm::vec3(1.0f, 0.0f, 0.0f);
             }
+            
+            if (glm::distance(m_position, player->get_position()) > 5.0f) m_ai_state = WALKING;
             break;
+        
+        default:
+            break;
+    }
+}
 
+void Entity::zubat_ai(Entity* player)
+{
+    switch (m_ai_state) {
+        case IDLE:
+            m_speed = 0.5f;
+            if (m_zubat_direction == -1) {
+                m_animation_indices = m_walking[LEFT];
+            } else if (m_zubat_direction == 1) {
+                m_animation_indices = m_walking[RIGHT];
+            }
+            
+            if (m_zubat_path >= MAX_ZUBAT_PATH) {
+                m_zubat_direction *= -1;
+                m_zubat_path = 0;
+            }
+            m_movement = glm::vec3(0.0f, m_zubat_direction, 0.0f);
+            m_zubat_path += 0.01f;
+            
+            if (glm::distance(m_position, player->get_position()) < 6.0f) m_ai_state = ATTACKING;
+            break;
+            
         case ATTACKING:
+            m_speed = 2.0f;
+            if (m_position.x > player->get_position().x && m_position.y > player->get_position().y) {
+                m_animation_indices = m_walking[LEFT];
+                m_movement = glm::vec3(-1.0f, -1.0f, 0.0f);
+                m_zubat_direction *= -1;
+            } else if (m_position.x > player->get_position().x && m_position.y < player->get_position().y) {
+                m_movement = glm::vec3(-1.0f, 1.0f, 0.0f);
+            } else if (m_position.x < player->get_position().x && m_position.y > player->get_position().y){
+                m_animation_indices = m_walking[RIGHT];
+                m_movement = glm::vec3(1.0f, -1.0f, 0.0f);
+                m_zubat_direction *= -1;
+            } else {
+                m_movement = glm::vec3(1.0f, 1.0f, 0.0f);
+            }
+
+            if (glm::distance(m_position, player->get_position()) > 6.0f) m_ai_state = IDLE;
             break;
 
         default:
             break;
-        }
+    }
+}
+
+void Entity::magby_ai(Entity* player)
+{
+    switch (m_ai_state) {
+        case IDLE:
+            m_is_attacking = false;
+            
+            if (m_position.x > player->get_position().x) {
+                m_animation_indices = m_walking[LEFT];
+            }
+            else {
+                m_animation_indices = m_walking[RIGHT];
+            }
+            if (glm::distance(m_position, player->get_position()) < 5.0f) m_ai_state = ATTACKING;
+            break;
+            
+        case ATTACKING:
+            if (m_position.x > player->get_position().x) {
+                m_animation_indices = m_walking[LEFT];
+                m_movement = glm::vec3(-1.0f, 0.0f, 0.0f);
+                m_magby_direction = -1;
+            }
+            else {
+                m_animation_indices = m_walking[RIGHT];
+                m_movement = glm::vec3(1.0f, 0.0f, 0.0f);
+                m_magby_direction = 1;
+            }if (!m_is_attacking) {
+                m_is_attacking = true;
+                if (glm::distance(m_position, player->get_position()) > 5.0f) m_ai_state = IDLE;
+                break;
+                
+            default:
+                break;
+            }
+    }
 }
 
 
 void Entity::update(float delta_time, Entity* player, Entity* objects, int object_count, Map* map)
 {
+    if (m_health <= 0) m_is_active = false;
     if (!m_is_active) return;
-
+    
     m_collided_top = false;
     m_collided_bottom = false;
     m_collided_left = false;
     m_collided_right = false;
-    m_collided_enemy = false;
-
-    if (m_entity_type == ENEMY) ai_activate(player);
-
+    m_collided_with_enemy = false;
+    
+    if (m_entity_type == ENEMY){
+        ai_activate(player);
+    }
+    
     if (m_animation_indices != NULL)
     {
         if (glm::length(m_movement) != 0)
         {
             m_animation_time += delta_time;
             float frames_per_second = (float)1 / SECONDS_PER_FRAME;
-
+            
             if (m_animation_time >= frames_per_second)
             {
                 m_animation_time = 0.0f;
                 m_animation_index++;
-
+                
                 if (m_animation_index >= m_animation_frames)
                 {
                     m_animation_index = 0;
@@ -188,34 +255,42 @@ void Entity::update(float delta_time, Entity* player, Entity* objects, int objec
             }
         }
     }
-
+    
     m_velocity.x = m_movement.x * m_speed;
+    if (m_ai_type == ZUBAT) {
+        m_velocity.y = m_movement.y * m_speed;
+    }
     m_velocity += m_acceleration * delta_time;
-
+    
     // We make two calls to our check_collision methods, one for the collidable objects and one for
     // the map.
     m_position.y += m_velocity.y * delta_time;
     check_collision_y(objects, object_count);
     check_collision_y(map);
-
+    
     m_position.x += m_velocity.x * delta_time;
     check_collision_x(objects, object_count);
     check_collision_x(map);
-
-    if (m_is_jumping)
-    {
+    
+    
+    if (m_entity_type == PLAYER && !m_attacked && check_collision(player)) {
+        player->set_health(player->get_health() - 1);
+        m_attacked = true;
+    }
+    
+    if (m_is_jumping){
         m_is_jumping = false;
         m_velocity.y += m_jumping_power;
     }
     
-    if (m_collided_enemy) {
-            m_health -= 1;
-        }
+    if (m_collided_with_enemy) {
+        m_health -= 1;
+    }
     
-
     m_model_matrix = glm::mat4(1.0f);
     m_model_matrix = glm::translate(m_model_matrix, m_position);
     m_model_matrix = glm::scale(m_model_matrix, m_scale_size);
+    
 }
 
 void const Entity::check_collision_y(Entity* collidable_entities, int collidable_entity_count)
@@ -224,20 +299,20 @@ void const Entity::check_collision_y(Entity* collidable_entities, int collidable
     {
         Entity* collidable_entity = &collidable_entities[i];
 
-        if (check_collision(collidable_entity))
-        {
+        if (check_collision(collidable_entity)){
             float y_distance = fabs(m_position.y - collidable_entity->get_position().y);
             float y_overlap = fabs(y_distance - (m_height / 2.0f) - (collidable_entity->get_height() / 2.0f));
             if (m_velocity.y > 0) {
                 m_position.y -= y_overlap;
                 m_velocity.y = 0;
                 m_collided_top = true;
-            }
-            else if (m_velocity.y < 0) {
+            } else if (m_velocity.y < 0) {
                 m_position.y += y_overlap;
                 m_velocity.y = 0;
                 m_collided_bottom = true;
             }
+            collidable_entity->set_health(collidable_entity->get_health() - 1);
+            m_attacked = true;
         }
     }
 }
@@ -248,20 +323,20 @@ void const Entity::check_collision_x(Entity* collidable_entities, int collidable
     {
         Entity* collidable_entity = &collidable_entities[i];
 
-        if (check_collision(collidable_entity))
-        {
+        if (check_collision(collidable_entity)){
             float x_distance = fabs(m_position.x - collidable_entity->get_position().x);
             float x_overlap = fabs(x_distance - (m_width / 2.0f) - (collidable_entity->get_width() / 2.0f));
             if (m_velocity.x > 0) {
-                m_position.x -= x_overlap;
-                m_velocity.x = 0;
+                m_position.x = (collidable_entity->get_position().x - 4.5f - x_overlap);
+                m_velocity.x = -1;
                 m_collided_right = true;
             }
             else if (m_velocity.x < 0) {
-                m_position.x += x_overlap;
+                m_position.x = (collidable_entity->get_position().x + 4.5f + x_overlap);
                 m_velocity.x = 0;
                 m_collided_left = true;
             }
+            m_collided_with_enemy = true;
         }
     }
 }
@@ -352,6 +427,10 @@ void const Entity::check_collision_x(Map* map)
 
 void Entity::render(ShaderProgram* program)
 {
+    if (m_health <= 0 && (m_entity_type == PLAYER || m_entity_type == ENEMY)) {
+        return;
+    }
+    
     program->set_model_matrix(m_model_matrix);
 
     if (m_animation_indices != NULL)
@@ -379,12 +458,13 @@ void Entity::render(ShaderProgram* program)
 
 bool const Entity::check_collision(Entity* other) const
 {
+    
     if (other == this) return false;
-    // If either entity is inactive, there shouldn't be any collision
-    if (!m_is_active || !other->m_is_active) return false;
 
-    float x_distance = fabs(m_position.x - other->m_position.x) - ((m_width + other->m_width) / 2.0f);
-    float y_distance = fabs(m_position.y - other->m_position.y) - ((m_height + other->m_height) / 2.0f);
+    if (!m_is_active || !other->m_is_active || other->m_health == 0) return false;
+
+    float x_distance = fabs(m_position.x - other->m_position.x) - ((m_width + other->m_width) * 0.5f / 2.0f);
+    float y_distance = fabs(m_position.y - other->m_position.y) - ((m_height + other->m_height) * 0.5f/ 2.0f);
 
     return x_distance < 0.0f && y_distance < 0.0f;
 }
