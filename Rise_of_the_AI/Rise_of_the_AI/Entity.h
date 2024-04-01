@@ -84,7 +84,6 @@ public:
     // ––––– PHYSICS (ATTACKING) ––––– //
     bool m_is_attacking = false;
     bool m_attacked = false;
-    int m_attack_direction = 1;
     
     // ––––– HEALTH ––––– //
     int m_health = 0;

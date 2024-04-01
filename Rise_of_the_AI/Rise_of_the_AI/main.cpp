@@ -184,8 +184,7 @@ GLuint load_texture(const char* filepath)
     return texture_id;
 }
 
-void draw_text(ShaderProgram *program, GLuint font_texture_id, std::string text, float screen_size, float spacing, glm::vec3 position)
-{
+void draw_text(ShaderProgram *program, GLuint font_texture_id, std::string text, float screen_size, float spacing, glm::vec3 position){
     float width = 1.0f / FONT_SIZE;
     float height = 1.0f / FONT_SIZE;
     
@@ -217,6 +216,23 @@ void draw_text(ShaderProgram *program, GLuint font_texture_id, std::string text,
             u_coordinate, v_coordinate + height,
         });
     }
+    
+    glm::mat4 model_matrix = glm::mat4(1.0f);
+    model_matrix = glm::translate(model_matrix, position);
+    
+    program->set_model_matrix(model_matrix);
+    glUseProgram(program->get_program_id());
+    
+    glVertexAttribPointer(program->get_position_attribute(), 2, GL_FLOAT, false, 0, vertices.data());
+    glEnableVertexAttribArray(program->get_position_attribute());
+    glVertexAttribPointer(program->get_tex_coordinate_attribute(), 2, GL_FLOAT, false, 0, texture_coordinates.data());
+    glEnableVertexAttribArray(program->get_tex_coordinate_attribute());
+    
+    glBindTexture(GL_TEXTURE_2D, font_texture_id);
+    glDrawArrays(GL_TRIANGLES, 0, (int) (text.size() * 6));
+    
+    glDisableVertexAttribArray(program->get_position_attribute());
+    glDisableVertexAttribArray(program->get_tex_coordinate_attribute());
 }
 
 void initialise()
@@ -445,15 +461,11 @@ void process_input()
     {
         g_game_state.player->move_left();
         g_game_state.player->m_animation_indices = g_game_state.player->m_walking[g_game_state.player->LEFT];
-        g_game_state.player->m_attack_direction = 0;
-        //g_game_state.attack->m_attack_direction = 0;
     }
     else if (key_state[SDL_SCANCODE_RIGHT])
     {
         g_game_state.player->move_right();
         g_game_state.player->m_animation_indices = g_game_state.player->m_walking[g_game_state.player->RIGHT];
-        g_game_state.player->m_attack_direction = 1;
-        //g_game_state.attack->m_attack_direction = 1;
     }
 
     // This makes sure that the player can't move faster diagonally
@@ -533,13 +545,13 @@ void render()
             
         case LOSE_SCREEN:
             //Mix_HaltMusic();
-            draw_text(&g_shader_program, g_font_texture_id, std::string("Game Over!"), 2.8f, -0.5f, glm::vec3(15.0f, -15.0f, 0.0f));
+            draw_text(&g_shader_program, g_font_texture_id, std::string("Game Over!"), 2.8f, -0.5f, glm::vec3(10.0f, -13.0f, 0.0f));
             
             break;
             
         case WIN_SCREEN:
             //Mix_HaltMusic();
-            draw_text(&g_shader_program, g_font_texture_id, std::string("You Win!"), 2.8f, -0.5f, glm::vec3(15.5f, -15.0f, 0.0f));
+            draw_text(&g_shader_program, g_font_texture_id, std::string("You Win!"), 2.8f, -0.5f, glm::vec3(10.0f, -13.0f, 0.0f));
             break;
             
         default:
@@ -556,7 +568,6 @@ void shutdown()
     delete[] g_game_state.enemies;
     delete[] g_game_state.health;
     delete    g_game_state.player;
-    delete    g_game_state.attack;
     delete    g_game_state.map;
     delete    g_game_state.background;
 }
