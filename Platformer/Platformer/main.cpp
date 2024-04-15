@@ -224,8 +224,7 @@ void update()
     
     g_player_health = g_current_scene->m_state.player->get_health();
 
-    std::cout << g_player_health << ", " << g_current_scene->m_state.player->get_health() << std::endl;
-    std::cout << g_current_scene->m_state.player->get_position().x << ", " << g_current_scene->m_state.player->get_position().y << std::endl;
+    std::cout << "Health: " << g_current_scene->m_state.player->get_health() << std::endl;
     
 }
 

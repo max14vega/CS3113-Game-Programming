@@ -30,9 +30,9 @@ void Menu::initialise()
     // ————— BACKGROUND SET-UP ————— //
     m_state.background = new Entity();
     m_state.background->set_health(10000);
-    m_state.background->set_position(glm::vec3(15.0f, -13.0f, 0.0f));
-    m_state.background->set_size(glm::vec3(45.0f, 30.0f, 0.0f));
-    m_state.background->m_texture_id = Utility::load_texture("assets/images/cave.png");
+    m_state.background->set_position(glm::vec3(18.0f, -13.0f, 0.0f));
+    m_state.background->set_size(glm::vec3(37.0f, 27.0f, 0.0f));
+    m_state.background->m_texture_id = Utility::load_texture("assets/images/TitleScreenBg.png");
     m_state.background->update(0.0f, m_state.background, NULL, 0, m_state.map);
     
     // ————— PLAYER SET-UP ————— //
@@ -56,6 +56,6 @@ void Menu::render(ShaderProgram *program)
 {
     m_state.background->render(program);
     m_state.map->render(program);
-    Utility::draw_text(program, m_font_texture_id, std::string("Press Enter to Start"), 2.0f, -0.7f, glm::vec3(5.5f, -14.0f, 0.0f));
+    Utility::draw_text(program, m_font_texture_id, std::string("Press Enter to Start"), 2.0f, -0.7f, glm::vec3(6.0f, -22.0f, 0.0f));
 
 }
