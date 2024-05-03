@@ -1,0 +1,103 @@
+/**
+* Author: Max Vega
+* Assignment: Platformer
+* Date due: 2024-04-13, 11:59pm
+* I pledge that I have completed this assignment without
+* collaborating with anyone else, in conformance with the
+* NYU School of Engineering Policies and Procedures on
+* Academic Misconduct.
+**/
+
+#include "Menu.h"
+#include "Utility.h"
+
+#define MENU_WIDTH 1
+#define MENU_HEIGHT 1
+
+unsigned int MENU_DATA[] = { 0 };
+
+bool blink = true;
+float b_timer = 0;
+const float max_b_timer = 0.4f;
+
+GLuint m_font_texture_id;
+
+Menu::~Menu()
+{
+    delete [] m_state.enemies;
+    delete    m_state.player;
+    delete    m_state.background;
+    delete    m_state.map;
+    Mix_FreeChunk(m_state.attack_sfx);
+    Mix_FreeMusic(m_state.bgm);
+}
+
+void Menu::initialise()
+{
+    // ————— MAP SET-UP ————— //
+    GLuint map_texture_id = Utility::load_texture("assets/images/pkmn_tileset.png");
+    m_state.map = new Map(MENU_WIDTH, MENU_HEIGHT, MENU_DATA, map_texture_id, 1.0f, 4, 1);
+    
+    // ————— FONT SET-UP ————— //
+    m_font_texture_id = Utility::load_texture("assets/images/font1.png");
+    
+    // ————— BACKGROUND SET-UP ————— //
+    m_state.background = new Entity();
+    m_state.background->set_health(10000);
+    m_state.background->set_position(glm::vec3(18.0f, -13.0f, 0.0f));
+    m_state.background->set_size(glm::vec3(37.0f, 27.0f, 0.0f));
+    m_state.background->m_texture_id = Utility::load_texture("assets/images/VentureBG.png");
+    m_state.background->update(0.0f, m_state.background, NULL, 0, m_state.map);
+    
+    // CHARACTER SET UP //
+    m_state.enemies = new Entity[3];
+    for (int i = 0; i < 3; i ++){
+        m_state.enemies[i].set_health(10000);
+        m_state.enemies[i].set_size(glm::vec3(10.0f, 10.0f, 0.0f));
+    }
+    
+    m_state.enemies[0].set_position(glm::vec3(10.0f, -20.0f, 0.0f));
+    m_state.enemies[0].m_texture_id = Utility::load_texture("assets/images/bulbasaur.png");
+    m_state.enemies[0].update(0.0f, m_state.background, NULL, 0, m_state.map);
+    
+    m_state.enemies[1].set_position(glm::vec3(18.0f, -20.0f, 0.0f));
+    m_state.enemies[1].m_texture_id = Utility::load_texture("assets/images/charmander.png");
+    m_state.enemies[1].update(0.0f, m_state.background, NULL, 0, m_state.map);
+    
+    m_state.enemies[2].set_position(glm::vec3(26.0f, -20.0f, 0.0f));
+    m_state.enemies[2].m_texture_id = Utility::load_texture("assets/images/squirtle.png");
+    m_state.enemies[2].update(0.0f, m_state.background, NULL, 0, m_state.map);
+    
+    // ————— PLAYER SET-UP ————— //
+    m_state.player = new Entity();
+    m_state.player->set_experience(0);
+    
+    // ————— MUSIC AND SFX SET-UP ————— //
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
+    
+    m_state.bgm = Mix_LoadMUS("assets/audio/titlescreen.mp3");
+    Mix_PlayMusic(m_state.bgm, -1);
+    Mix_VolumeMusic(MIX_MAX_VOLUME/2);
+}
+
+void Menu::update(float delta_time)
+{
+    b_timer += delta_time;
+    if(b_timer > max_b_timer){
+        blink = not blink;
+        b_timer = 0;
+    }
+}
+
+
+void Menu::render(ShaderProgram *program)
+{
+    m_state.background->render(program);
+    m_state.enemies[0].render(program);
+    m_state.enemies[1].render(program);
+    m_state.enemies[2].render(program);
+    
+    if(blink){
+        Utility::draw_text(program, m_font_texture_id, std::string("Press '1', '2', or '3' to Start"), 1.6f, -0.5f, glm::vec3(1.8f, -24.0f, 0.0f));
+    }
+}

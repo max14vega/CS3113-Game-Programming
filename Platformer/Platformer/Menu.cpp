@@ -42,7 +42,7 @@ void Menu::initialise()
     m_state.background->set_health(10000);
     m_state.background->set_position(glm::vec3(18.0f, -13.0f, 0.0f));
     m_state.background->set_size(glm::vec3(37.0f, 27.0f, 0.0f));
-    m_state.background->m_texture_id = Utility::load_texture("assets/images/TitleScreenBg.png");
+    m_state.background->m_texture_id = Utility::load_texture("assets/images/VentureBG.png");
     m_state.background->update(0.0f, m_state.background, NULL, 0, m_state.map);
     
     // ————— PLAYER SET-UP ————— //
