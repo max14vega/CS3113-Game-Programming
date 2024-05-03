@@ -89,6 +89,8 @@ public:
     bool m_is_attacking = false;
     bool m_attacked = false;
     bool m_is_hit = false;
+    float m_attack_timer = 0;
+    bool m_spawn_atk = false;
     
     // ––––– HEALTH ––––– //
     int m_health = 0;
@@ -130,10 +132,10 @@ public:
     void move_up()      { m_movement.y = 1.0f; };
     void move_down()    { m_movement.y = -1.0f; };
 
-    void ai_activate(Entity* player);
-    void ratata_ai(Entity* player);
-    void zubat_ai(Entity* player);
-    void magby_ai(Entity* player);
+    void ai_activate(float delta_time, Entity* player);
+    void ratata_ai(float delta_time, Entity* player);
+    void zubat_ai(float delta_time, Entity* player);
+    void magby_ai(float delta_time, Entity* player);
 
     void activate() { m_is_active = true; };
     void deactivate() { m_is_active = false; };

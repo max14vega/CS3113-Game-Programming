@@ -159,6 +159,7 @@ void process_input()
                 if(g_current_scene == g_menu){
                     g_chosen_char = 0;
                     switch_scene(g_level_a);
+                    //switch_scene(g_level_c);
                     g_current_scene->current_character = g_chosen_char;
 
                 }
@@ -285,6 +286,10 @@ void update()
     
     g_view_matrix = glm::mat4(1.0f);
     
+    if (g_current_scene->lose_screen) {
+        return;
+    }
+    
     if (g_current_scene != g_menu){
         float cam_x = g_current_scene->m_state.player->get_position().x;
         float cam_y = g_current_scene->m_state.player->get_position().y;
@@ -334,13 +339,14 @@ int main(int argc, char* argv[])
             }
             if(experience_accumulated == 3) {
                 g_current_scene->evo_stage = 1;
-                Mix_PlayChannel(-1, g_current_scene->m_state.evolve_sfx, 0);
+                //Mix_PlayChannel(-1, g_current_scene->m_state.evolve_sfx, 0);
             }
             if(experience_accumulated == 6) {
                 g_current_scene->evo_stage = 2;
-                Mix_PlayChannel(-1, g_current_scene->m_state.evolve_sfx, 0);
+                //Mix_PlayChannel(-1, g_current_scene->m_state.evolve_sfx, 0);
             }
             switch_scene(g_levels[g_current_scene->m_state.next_scene_id]);
+            //switch_scene(g_levels[2]);
             g_current_scene->m_state.player->set_health(g_player_health);
             
         }

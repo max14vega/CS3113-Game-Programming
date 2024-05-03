@@ -49,6 +49,7 @@ public:
     int experience = 0;
     int current_character = 0;
     bool ping[10] = {false, false, false, false, false, false, false, false, false, false};
+    bool lose_screen = false;
     
     int player_projectile_idx = 0;
     int projectile_idx_1 = 0;

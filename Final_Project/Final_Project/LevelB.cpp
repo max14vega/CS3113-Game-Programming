@@ -272,15 +272,22 @@ void LevelB::update(float delta_time)
             experience += 1;
         }
     }
+    
+    if (m_state.player->get_health() <= 0 || player_projectile_idx == PROJECTILE_COUNT) {
+        lose_screen = true;
+    }
 }
 
 
 void LevelB::render(ShaderProgram *program)
 {
-    if (m_state.player->get_health() <= 0 || player_projectile_idx == PROJECTILE_COUNT) {
-        Utility::draw_text(program, m_font_b, std::string("Game Over!"), 2.8f, -0.8f, glm::vec3(6.0f, -28.0f, 0.0f));
+    if (lose_screen) {
         Mix_HaltMusic();
-        Mix_PlayChannel(-1, m_state.lose_sfx, 0);
+        Utility::draw_text(program, m_font_b, std::string("Game Over!"), 2.8f, -0.8f, glm::vec3(-10.0f, 0.0f, 0.0f));
+        if (!ping[9]) {
+            Mix_PlayChannel(-1, m_state.lose_sfx, 0);
+            ping[9] = true;
+        }
     } else {
         m_state.background->render(program);
         m_state.player->render(program);
@@ -296,6 +303,18 @@ void LevelB::render(ShaderProgram *program)
         if(m_state.player->get_position().y < -28.3){ exp_y = -28.3; }
         if(m_state.player->get_position().y > -13.7){ exp_y = -13.7; }
         Utility::draw_text(program, m_font_b, std::string("Experience: ") + exp, 1.3f, -0.6f, glm::vec3(exp_x - 17.0f, exp_y + 12.0f, 0.0f));
+        
+        std::stringstream ss2;
+        ss2 << std::fixed << std::setprecision(0) << m_state.player->get_health();
+        std::string health = ss2.str();
+        
+        float health_x = m_state.player->get_position().x;
+        float health_y = m_state.player->get_position().y;
+        if(m_state.player->get_position().x < 15.5){ health_x = 15.5; }
+        if(m_state.player->get_position().x > 34.5){ health_x = 34.5; }
+        if(m_state.player->get_position().y < -28.3){ health_y = -28.3; }
+        if(m_state.player->get_position().y > -13.7){ health_y = -13.7; }
+        Utility::draw_text(program, m_font_b, std::string("Health: ") + health, 1.3f, -0.6f, glm::vec3(health_x + 10.0f, health_y + 12.0f, 0.0f));
         
         for(int i = 0; i < ENEMY_COUNT; i ++){
             m_state.enemies[i].render(program);
